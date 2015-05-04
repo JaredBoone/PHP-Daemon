@@ -530,13 +530,21 @@ abstract class Core_Worker_Mediator implements Core_ITask
             // This is a bit ugly but ftok needs a filesystem path so we give it one using the daemon filename and
             // current worker alias.
 
-            $tmp = sys_get_temp_dir();
+            // use the current dir to try to get a unique Inode from ftok,
+            // $tmp = sys_get_temp_dir();
+
+            $tmp = getcwd();
+
             $ftok = sprintf($tmp . '/%s_%s', str_replace('/', '_', $this->daemon->get('filename')), $this->alias);
+
             if (!touch($ftok))
                 $this->fatal_error("Unable to create Worker ID. ftok() failed. Could not write to {$tmp} directory at {$ftok}");
 
             $this->guid = ftok($ftok, $this->alias[0]);
-            @unlink($ftok);
+
+
+            //   Leave file there so we can use the inode for uniqueness
+            // @unlink($ftok);
 
             if ($this->guid == -1)
                 $this->fatal_error("Unable to create Worker ID. ftok() failed. Unexpected return value: $this->guid");
@@ -685,7 +693,7 @@ abstract class Core_Worker_Mediator implements Core_ITask
                 if ($this->process($call->pid))
                     $this->process($call->pid)->job = $call->id;
 
-                $this->log('Job ' . $call->id . ' Is Running');
+                // $this->log('Job ' . $call->id . ' Is Running');
             }
 
             while($call = $this->via->get(self::WORKER_RETURN)) {
@@ -706,7 +714,7 @@ abstract class Core_Worker_Mediator implements Core_ITask
                 else
                     $this->log('No onReturn Callback Available');
 
-                $this->log('Job ' . $call->id . ' Is Complete');
+                // $this->log('Job ' . $call->id . ' Is Complete');
             }
 
             // Enforce Timeouts

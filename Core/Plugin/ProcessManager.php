@@ -48,7 +48,7 @@ class Core_Plugin_ProcessManager implements Core_IPlugin
      * @return void
      */
     public function setup() {
-        $this->daemon->on(Core_Daemon::ON_IDLE, array($this, 'reap'), 30);
+        $this->daemon->on(Core_Daemon::ON_IDLE, array($this, 'reap'), 15);
     }
 
     /**

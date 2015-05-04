@@ -346,10 +346,18 @@ abstract class Core_Daemon
         {
             $this->set('shutdown', true);
             $this->dispatch(array(self::ON_SHUTDOWN));
-            foreach($this->workers + $this->plugins as $object) {
-                $this->{$object}->teardown();
-                unset($this->{$object});
-            }
+			foreach($this->workers as $object) {
+				if(isset($this->{$object})){
+					$this->{$object}->teardown();
+					unset($this->{$object});
+				}
+			}
+			foreach($this->plugins as $object) {
+				if(isset($this->{$object})){
+					$this->{$object}->teardown();
+					unset($this->{$object});
+				}
+			}
         }
         catch (Exception $e)
         {
